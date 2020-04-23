@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Numeric
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from database import Base, engine
 
 
 class User(Base):
@@ -11,8 +11,8 @@ class User(Base):
     password = Column(String)
     email = Column(String, unique=True, index=True)
     is_active = Column(Boolean, default=False)
-    profile = relationship('user_profile', uselist=False, backref='user')
-    extend = relationship('user_extend', uselist=False, backref='user')
+    profile = relationship('UserProfile', backref='User')
+    extend = relationship('UserExtend', backref='User')
 
 
 class UserProfile(Base):
@@ -34,3 +34,4 @@ class UserExtend(Base):
     signature = Column(String)
     self_introduction = Column(String)
 
+Base.metadata.create_all(engine)
