@@ -38,3 +38,8 @@ class UserExtend(Base):
 
     # foreign key
     user_id = Column(Integer, ForeignKey("user.id"))
+
+
+if __name__ == '__main__':
+    from app.db.session import engine
+    Base.metadata.create_all(engine)

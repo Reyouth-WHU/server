@@ -20,16 +20,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             is_active=obj_in.is_active,
             is_superuser=obj_in.is_superuser,
         )
-        add_and_commit(db, user)
         # 在 `userprofile` 表和 `userextend` 表同时初始化空项目
-        profile = UserProfile(
-            user_id=user.id
-        )
-        add_and_commit(db, profile)
-        extend = UserExtend(
-            user_id=user.id
-        )
-        add_and_commit(db, extend)
+        user.profile = UserProfile(user_id=user.id)
+        user.extend = UserExtend(user_id=user.id)
+        add_and_commit(db, user)
         return user
 
     def update(
