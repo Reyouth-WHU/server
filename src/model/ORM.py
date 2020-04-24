@@ -4,7 +4,15 @@ from collections import Iterable
 
 
 class UserORM:
-    def create(self, user: models.User):
+    @staticmethod
+    def create(user: models.User):
+        """
+        example:
+            Tom = User()
+            UserORM.creat(Tom)
+        :param user:
+        :return:
+        """
         db = SessionLocal()
         db.add(user)
         db.commit()
@@ -13,7 +21,14 @@ class UserORM:
         db.add_all([empty_profile, empty_extend])
         db.commit()
 
-    def delete(self, where_conds=[]):
+    @staticmethod
+    def delete(where_conds=[]):
+        """
+        example:
+            UserORM.delete([User.id>1, User.is_active == 0])
+        :param where_conds:
+        :return:
+        """
         db = SessionLocal()
         all_users = db.query(models.User).filter(*where_conds)
         for user in all_users:
@@ -24,14 +39,31 @@ class UserORM:
             db.query(models.User).filter(models.User.id == user.id).delete()
             db.commit()
 
-
-    def update(self, update_dict, where_conds=[]):
+    @staticmethod
+    def update(update_dict, where_conds=[]):
+        """
+        example:
+            UserORM.update({'username':'abc123'}, [User.id>=1])
+        :param update_dict:
+        :param where_conds:
+        :return:
+        """
         db = SessionLocal()
         db.query(models.User).filter(*where_conds).update(update_dict, synchronize_session='fetch')
         db.commit()
 
-
-    def read(self, params, **where_conds):
+    @staticmethod
+    def read(params, **where_conds):
+        """
+        example:
+            query = UserORM.read([UserORM.id, UserORM.name],
+                filter=[UserORM.id>=1],
+                group_by=[UserORM.id, UserORM.username]
+                order_by=UserORM.id.desc(), limit=10, offset=0)
+        :param params:
+        :param where_conds:
+        :return:
+        """
         db = SessionLocal()
         if not where_conds:
             if not set(where_conds.keys()).issubset(
