@@ -11,13 +11,13 @@ class User(Base):
     password = Column(String)
     email = Column(String, unique=True, index=True)
     is_active = Column(Boolean, default=False)
-    profile = relationship('UserProfile', backref='User')
-    extend = relationship('UserExtend', backref='User')
+    profile = relationship('UserProfile', uselist=False, backref='user', cascade='all, delete-orphan', passive_deletes=True)
+    extend = relationship('UserExtend', uselist=False, backref='user', cascade='all, delete-orphan', passive_deletes=True)
 
 
 class UserProfile(Base):
     __tablename__ = 'user_profile'
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'))
     id = Column(Integer, primary_key=True, index=True)
     nick_name = Column(String)
     telephone_num = Column(Numeric, unique=True, index=True)
@@ -28,10 +28,10 @@ class UserProfile(Base):
 
 class UserExtend(Base):
     __tablename__ = 'user_extend'
-    user_id = Column(Integer, ForeignKey('user.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'))
     id = Column(Integer, primary_key=True, index=True)
     signature = Column(String)
     self_introduction = Column(String)
+
 
 Base.metadata.create_all(engine)

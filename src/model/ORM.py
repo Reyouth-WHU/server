@@ -14,11 +14,11 @@ class UserORM:
         :return:
         """
         db = SessionLocal()
+        if not user.profile:
+            user.profile = models.UserProfile()
+        if not user.extend:
+            user.extend = models.UserExtend()
         db.add(user)
-        db.commit()
-        empty_profile = models.UserProfile(user_id=user.id)
-        empty_extend = models.UserExtend(user_id=user.id)
-        db.add_all([empty_profile, empty_extend])
         db.commit()
 
     @staticmethod
@@ -56,7 +56,7 @@ class UserORM:
     def read(params, **where_conds):
         """
         example:
-            query = UserORM.read([UserORM.id, UserORM.name],
+            query = UserORM.read([User.id, User.username],
                 filter=[UserORM.id>=1],
                 group_by=[UserORM.id, UserORM.username]
                 order_by=UserORM.id.desc(), limit=10, offset=0)
