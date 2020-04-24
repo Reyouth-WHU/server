@@ -9,7 +9,7 @@ class UserORM:
         """
         example:
             Tom = User()
-            UserORM.creat(Tom)
+            UserORM.create(Tom)
         :param user:
         :return:
         """
