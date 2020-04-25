@@ -12,3 +12,8 @@ class Base:
     def __tablename__(cls) -> str:
         return cls.__name__.lower()
 
+if __name__ == '__main__':
+    from app.db.session import engine
+    # 创建数据表前必须先导入继承 Base 的类
+    from app.models.user import *
+    Base.metadata.create_all(engine)
