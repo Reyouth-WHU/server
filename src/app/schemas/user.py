@@ -35,7 +35,7 @@ class UserCreate(UserBase):
 
 # 创建用户后的返回模型
 class UserCreateResponse(UserBase):
-    username: Optional[str] = None
+    username: str
 
 
 # model when update user

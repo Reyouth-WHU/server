@@ -24,7 +24,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         user.profile = UserProfile(user_id=user.id)
         user.extend = UserExtend(user_id=user.id)
         add_and_commit(db, user)
-        return user
+        return jsonable_encoder(user)
 
     def update(
         self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
@@ -38,34 +38,32 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             del update_data["password"]
             update_data["hashed_password"] = hashed_password
 
-        # fixme
-        # can't use `jsonable_encoder` after `db_obj` is committed
-
         # update `userprofile` table
-        db_profile = self.update_once(db_obj.profile, update_data.get("profile"))
-        db.add(db_profile)
+        # db_profile = self.update_once(db_obj.profile, update_data.get("profile"))
+        self.update_once(db_obj.profile, update_data.get("profile"))
         del update_data["profile"]
         # update `userextend` table
-        db_extend = self.update_once(db_obj.extend, update_data.get("extend"))
-        db.add(db_extend)
+        self.update_once(db_obj.extend, update_data.get("extend"))
         del update_data["extend"]
         # update `user` table
-        db_obj = db_profile = self.update_once(db_obj, update_data)
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        self.update_once(db_obj, update_data)
+        add_and_commit(db, db_obj)
         return self.get_full_info(db, db_obj)
 
     def remove(self, db: Session, *, id: int) -> User:
         user = db.query(self.model).get(id)
+        user_info = self.get_full_info(db, user)
         db.delete(user)
         db.query(UserProfile).filter(UserProfile.user_id == user.id).delete()
         db.query(UserExtend).filter(UserExtend.user_id == user.id).delete()
         db.commit()
-        return user
+        return user_info
 
     def get_by_username(self, db: Session, username: str) -> User:
         return db.query(self.model).filter(self.model.username == username).first()
+
+    def get_by_email(self, db: Session, email: str) -> User:
+        return db.query(self.model).filter(self.model.email == email).first()
 
     def get_full_info(self, db: Session, user: User) -> UserScheme:
         profile = db.query(UserProfile).filter(UserProfile.user_id == user.id).first()
@@ -109,8 +107,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         for field in obj_data:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
-
-        return db_obj
 
 
 user = CRUDUser(User)
