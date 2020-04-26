@@ -24,10 +24,14 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         user.profile = UserProfile(user_id=user.id)
         user.extend = UserExtend(user_id=user.id)
         add_and_commit(db, user)
-        return jsonable_encoder(user)
+        return user
 
     def update(
-        self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
+        self,
+        db: Session,
+        *,
+        db_obj: User,
+        obj_in: Union[UserUpdate, Dict[str, Any]]
     ) -> UserScheme:
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -40,11 +44,13 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
         # update `userprofile` table
         # db_profile = self.update_once(db_obj.profile, update_data.get("profile"))
-        self.update_once(db_obj.profile, update_data.get("profile"))
-        del update_data["profile"]
+        if update_data.get("profile"):
+            self.update_once(db_obj.profile, update_data.get("profile"))
+            del update_data["profile"]
         # update `userextend` table
-        self.update_once(db_obj.extend, update_data.get("extend"))
-        del update_data["extend"]
+        if update_data.get("extend"):
+            self.update_once(db_obj.extend, update_data.get("extend"))
+            del update_data["extend"]
         # update `user` table
         self.update_once(db_obj, update_data)
         add_and_commit(db, db_obj)
@@ -92,21 +98,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def is_superuser(self, user: User) -> bool:
         return user.is_superuser
-
-    # todo
-    @staticmethod
-    def update_once(
-        db_obj,
-        obj_in
-    ):
-        obj_data = jsonable_encoder(db_obj)
-        if isinstance(obj_in, dict):
-            update_data = obj_in
-        else:
-            update_data = obj_in.dict(exclude_unset=True)
-        for field in obj_data:
-            if field in update_data:
-                setattr(db_obj, field, update_data[field])
 
 
 user = CRUDUser(User)

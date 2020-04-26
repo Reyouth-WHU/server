@@ -1,4 +1,5 @@
 import secrets
+import os
 
 from pydantic import BaseSettings
 
@@ -11,7 +12,11 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "reyouth"
 
-    SQLALCHEMY_DATABASE_URI = "sqlite:///C:/Users/qiufeng/Desktop/reyouth/test.sqlite3"
+    # todo
+    # too ugly
+    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{ROOT_DIR}/test.sqlite3"
 
 
 settings = Settings()
