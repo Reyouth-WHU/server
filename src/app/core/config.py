@@ -18,6 +18,10 @@ class Settings(BaseSettings):
 
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{ROOT_DIR}/test.sqlite3"
 
+    USERNAME_TEST_USER = "miaomiaomiao"
+    FIRST_SUPERUSER = "string"
+    FIRST_SUPERUSER_PASSWORD = "string"
+
 
 settings = Settings()
 

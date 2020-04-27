@@ -10,6 +10,11 @@ class UserBase(BaseModel):
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
 
+    # 这一行非常重要！！
+    # 用来支持直接返回 orm model 的情况
+    class Config:
+        orm_mode = True
+
 
 # corresponding to table `userprofile`
 class UserProfile(BaseModel):
@@ -19,11 +24,17 @@ class UserProfile(BaseModel):
     age: Optional[int] = None
     sex: Optional[int] = None
 
+    class Config:
+        orm_mode = True
+
 
 # corresponding to table `userextend`
 class UserExtend(BaseModel):
     signature: Optional[str] = None
     self_introduction: Optional[str] = None
+
+    class Config:
+        orm_mode = True
 
 
 # model when create user
@@ -36,6 +47,9 @@ class UserCreate(UserBase):
 # 创建用户后的返回模型
 class UserCreateResponse(UserBase):
     username: str
+
+    class Config:
+        orm_mode = True
 
 
 # model when update user

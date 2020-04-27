@@ -6,14 +6,14 @@ from fastapi.encoders import jsonable_encoder
 from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User, UserProfile, UserExtend
-from app.schemas.user import UserCreate, UserUpdate, User as UserScheme
+from app.schemas.user import UserCreate, UserUpdate, UserCreateResponse, User as UserScheme
 from app.db.utils import add_and_commit
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
-        user = User(
+        db_obj = User(
             username=obj_in.username,
             hashed_password=get_password_hash(obj_in.password),
             email=obj_in.email,
@@ -21,10 +21,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             is_superuser=obj_in.is_superuser,
         )
         # 在 `userprofile` 表和 `userextend` 表同时初始化空项目
-        user.profile = UserProfile(user_id=user.id)
-        user.extend = UserExtend(user_id=user.id)
-        add_and_commit(db, user)
-        return user
+        db_obj.profile = UserProfile(user_id=db_obj.id)
+        db_obj.extend = UserExtend(user_id=db_obj.id)
+        add_and_commit(db, db_obj)
+        return db_obj
 
     def update(
         self,

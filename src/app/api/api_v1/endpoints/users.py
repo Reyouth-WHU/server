@@ -22,12 +22,13 @@ def create_user(
     Create new user.
     """
     user = crud.user.get_by_username(db, username=user_in.username)
-    if user or crud.user.get_by_email(db, email=user_in.email):
+    if user or (user_in.email is not None and crud.user.get_by_email(db, email=user_in.email)):
         raise HTTPException(
             status_code=400,
             detail="The username or email already exists in the system.",
         )
     user = crud.user.create(db, obj_in=user_in)
+
     return user
 
 
@@ -85,7 +86,7 @@ def read_user_by_id(
         raise HTTPException(
             status_code=400, detail="The user doesn't have enough privileges"
         )
-    return crud.user.get_full_info(db, current_user)
+    return crud.user.get_full_info(db, user)
 
 
 @router.put("/{user_id}", response_model=schemas.User)

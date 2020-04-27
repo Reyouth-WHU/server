@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.db.session import SessionLocal
 from app.main import app
 from app.tests.utils.utils import get_superuser_token_headers
+from app.tests.utils.user import authentication_token_from_username
 
 
 @pytest.fixture(scope="session")
@@ -27,3 +28,9 @@ def client() -> Generator:
 def superuser_token_headers(client: TestClient) -> Dict[str, str]:
     return get_superuser_token_headers(client)
 
+
+@pytest.fixture(scope="module")
+def normal_user_token_headers(client: TestClient, db: Session) -> Dict[str, str]:
+    return authentication_token_from_username(
+        client=client, username=settings.USERNAME_TEST_USER, db=db
+    )
